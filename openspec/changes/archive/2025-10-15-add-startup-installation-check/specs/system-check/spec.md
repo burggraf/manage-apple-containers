@@ -1,30 +1,10 @@
-# system-check Specification
+# system-check Specification Delta
 
 ## Purpose
 
-This capability provides system dependency verification for the Apple Container CLI, which is a critical external dependency required for the application to function. It enables the application to programmatically check whether the `container` command is installed and accessible, and provides user feedback about the system's readiness to manage containers.
-## Requirements
-### Requirement: Container CLI Version Check
+Extends the `system-check` capability to provide automatic container CLI verification on application startup and user-friendly installation guidance when the CLI is not found.
 
-The system SHALL provide a mechanism to verify that the Apple Container CLI is installed and accessible on the host macOS system.
-
-#### Scenario: Container CLI is installed
-
-- **WHEN** the `check_container_version` command is invoked
-- **AND** the `container` CLI tool is installed and in the system PATH
-- **THEN** the command SHALL return success with the version string output
-
-#### Scenario: Container CLI is not installed
-
-- **WHEN** the `check_container_version` command is invoked
-- **AND** the `container` CLI tool is not found in the system PATH
-- **THEN** the command SHALL return an error indicating the tool is not installed
-
-#### Scenario: Container CLI command fails
-
-- **WHEN** the `check_container_version` command is invoked
-- **AND** the `container` CLI tool exists but the `--version` flag fails
-- **THEN** the command SHALL return an error with the failure details
+## ADDED Requirements
 
 ### Requirement: Automatic Startup Installation Check
 
@@ -80,3 +60,15 @@ The application SHALL provide a modal dialog component specifically for guiding 
 - **THEN** the modal SHALL clearly communicate that the application will exit when closed
 - **AND** SHALL provide instructions to restart the application after installing the CLI
 
+## REMOVED Requirements
+
+### Requirement: System Check UI Verification
+
+The temporary UI control for manually triggering the container system check has been removed as it is no longer needed with automatic startup checking.
+
+## Dependencies
+
+- Leverages existing `check_container_version` Tauri command from `system-check` capability
+- Requires Shadcn UI Dialog component
+- Uses Tauri's shell plugin (`@tauri-apps/plugin-shell`) for opening external URLs
+- Uses Tauri's process API (`@tauri-apps/plugin-process`) for application exit

@@ -1,70 +1,55 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { exit } from "@tauri-apps/plugin-process";
 import { Layout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { InstallationRequiredModal } from "@/components/system/InstallationRequiredModal";
 
 function App() {
-	const [versionResult, setVersionResult] = useState<string>("");
-	const [isChecking, setIsChecking] = useState<boolean>(false);
-	const [isError, setIsError] = useState<boolean>(false);
+	const [showInstallModal, setShowInstallModal] = useState<boolean>(false);
 
-	const handleCheckContainerVersion = async () => {
-		setIsChecking(true);
-		setVersionResult("");
-		setIsError(false);
+	// Startup check for container CLI
+	useEffect(() => {
+		const checkContainerInstallation = async () => {
+			try {
+				await invoke<string>("check_container_version");
+				// CLI is installed, proceed normally
+			} catch (error) {
+				const errorMessage = String(error);
+				// Only show modal if CLI is not found (not for other errors)
+				if (errorMessage.includes("not found")) {
+					setShowInstallModal(true);
+				} else {
+					// Log other errors but don't block the app
+					// eslint-disable-next-line no-undef
+					console.error("Container version check failed:", errorMessage);
+				}
+			}
+		};
 
-		try {
-			const version = await invoke<string>("check_container_version");
-			setVersionResult(`Container CLI installed: ${version}`);
-			setIsError(false);
-		} catch (error) {
-			setVersionResult(String(error));
-			setIsError(true);
-		} finally {
-			setIsChecking(false);
-		}
+		checkContainerInstallation();
+	}, []);
+
+	const handleCloseInstallModal = async () => {
+		// Exit the application when user closes the modal
+		await exit(0);
 	};
 
 	return (
-		<Layout>
-			<div className="space-y-6">
+		<>
+			<InstallationRequiredModal
+				isOpen={showInstallModal}
+				onClose={handleCloseInstallModal}
+			/>
+			<Layout>
+				<div className="space-y-6">
 				<div>
 					<h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
 					<p className="text-muted-foreground">
 						Welcome to MAC - Manage Apple Containers
 					</p>
 				</div>
-
-				{/* Temporary System Check Card */}
-				<Card className="border-dashed">
-					<CardHeader>
-						<CardTitle>System Check (Temporary)</CardTitle>
-						<CardDescription>
-							Verify that the Apple Container CLI is installed
-						</CardDescription>
-					</CardHeader>
-					<CardContent className="space-y-4">
-						<Button
-							onClick={handleCheckContainerVersion}
-							disabled={isChecking}
-							variant="default"
-						>
-							{isChecking ? "Checking..." : "Is container installed?"}
-						</Button>
-						{versionResult && (
-							<div
-								className={`p-4 rounded-md text-sm ${
-									isError
-										? "bg-destructive/10 text-destructive border border-destructive/20"
-										: "bg-green-50 text-green-700 border border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-900"
-								}`}
-							>
-								{versionResult}
-							</div>
-						)}
-					</CardContent>
-				</Card>
 
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					<Card>
@@ -105,6 +90,7 @@ function App() {
 				</div>
 			</div>
 		</Layout>
+		</>
 	);
 }
 

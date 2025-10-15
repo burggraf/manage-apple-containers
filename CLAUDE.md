@@ -29,7 +29,27 @@ MAC (Manage Apple Containers) is a Tauri 2.x desktop application for managing Ap
 - macOS 26+ (required by Apple Container system)
 - Apple Silicon Mac (ARM architecture)
 - Node.js 18+ and Rust toolchain
-- Apple Container CLI must be installed separately
+- **Apple Container CLI must be installed separately** (see Installation below)
+
+## Installation
+
+### Apple Container CLI (Required)
+
+The application requires the Apple Container CLI to be installed on your system. **The app will not start without it.**
+
+1. Download the latest release from: https://github.com/apple/container/releases/latest
+2. Install the CLI following the instructions in the release
+3. Verify installation: `container --version`
+
+**Automatic Startup Check:** The application automatically checks for the Container CLI when it launches. If not found, a modal dialog will appear with:
+- A direct link to the GitHub releases page
+- Instructions to install and restart the application
+- The application will exit when you close the modal
+
+**Troubleshooting:**
+- If the modal appears even after installation, ensure `container` is in your PATH
+- Try running `which container` to verify the CLI is accessible
+- After installing the CLI, restart the application
 
 ## Common Commands
 
