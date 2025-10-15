@@ -15,10 +15,7 @@ interface InstallationRequiredModalProps {
 	onClose: () => void;
 }
 
-export function InstallationRequiredModal({
-	isOpen,
-	onClose,
-}: InstallationRequiredModalProps) {
+export function InstallationRequiredModal({ isOpen, onClose }: InstallationRequiredModalProps) {
 	const handleOpenGitHub = async () => {
 		try {
 			await open("https://github.com/apple/container/releases/latest");
@@ -42,16 +39,16 @@ export function InstallationRequiredModal({
 						<DialogTitle>Apple Container CLI Required</DialogTitle>
 					</div>
 					<DialogDescription className="pt-4">
-						The Apple Container CLI is required for this application to
-						function. MAC (Manage Apple Containers) is a graphical interface for
-						the container system and cannot operate without it.
+						The Apple Container CLI is required for this application to function. MAC
+						(Manage Apple Containers) is a graphical interface for the container system
+						and cannot operate without it.
 					</DialogDescription>
 				</DialogHeader>
 
 				<div className="space-y-4">
 					<p className="text-sm text-muted-foreground">
-						Please install the Apple Container CLI from the official GitHub
-						releases page and restart the application.
+						Please install the Apple Container CLI from the official GitHub releases
+						page and restart the application.
 					</p>
 
 					<Button
